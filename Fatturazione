@@ -1,0 +1,123 @@
+IDENTIFICATION DIVISION.
+
+PROGRAM-ID. PGMALI.
+AUTHOR.     ALIM.
+ENVIRONMENT DIVISION.
+
+CONFIGURATION SECTION.
+SOURCE-COMPUTER.       IBM-AS400.
+OBJECT-COMPUTER.       IBM-AS400.
+SPECIAL-NAMES.
+DECIMAL-POINT IS COMMA.
+INPUT-OUTPUT SECTION.
+FILE-CONTROL.
+
+*-------------------------------------------------------------------------------------*
+*          DESCRIZIONE DEL FILE FISICO FCLIENTI                                        *
+*-------------------------------------------------------------------------------------*
+
+    SELECT FCLIENTI ASSIGN TO FORMATFILE-FCLIENTI
+    ORGANIZATION IS SEQUENTIAL
+    ACCESS MODE  IS SEQUENTIAL
+    FILE-STATUS IS FS-CLIENTI.
+*-------------------------------------------------------------------------------------*
+*          DESCRIZIONE DEL FILE FISICO FFATTURE                                       *
+*-------------------------------------------------------------------------------------*   
+
+    SELECT FFATTURE ASSIGN TO DATABASE-FFATTURE
+    ORGANIZATION IS INDEXED
+    ACCESS MODE IS DYNAMIC
+    RECORD KEY IS KEY-FFATTURE
+    FILE STATUS IS FS-FFATTURE.
+*--------------------------------------------------------------------------------------*
+*          DESCRIZIONE DEL FILE FISICO SITCLIENT                                       *
+*--------------------------------------------------------------------------------------*
+
+    SELECT SITCLIEN ASSIGN TO FORMATFILE-SITCLIEN
+    ORGANIZATION IS SEQUENTIAL
+    ACCESS MODE IS SEQUENTIAL
+    FILE STATUS IS FS-SITCLIEN.
+    
+*---------------------------------------------------------------------------------------*
+    DATA DIVISION.
+    
+    FILE SECTION.
+*---------------------------------------------------------------------------------------*
+*    FD RELATIVA AL FILE CLIENTI                                                        *
+*---------------------------------------------------------------------------------------*
+    FD FCLIENTI
+        LABEL RECORD IS STANDARD
+        RECORD CONTAINS 100 CHARACTERS
+        DATA RECORD IS REC-CLIENTI.
+    01 REC-CLIENTI    PIC X(100).
+*---------------------------------------------------------------------------------------*
+*    FD RELATIVA AL FILE FFATTURE                                                  *
+*---------------------------------------------------------------------------------------*  
+    FD FFATTURE 
+       LABEL RECORD IS STANDARD
+       RECORD CONTAINS 50 CHARACTERS
+       DATA RECORD IS REC-FATTURE.
+    01 REC-FATTURE.
+        05 KEY-FFATTURE.
+           07 FFAT-COD-CLI    PIC 9(5).
+           07 FFAT-NUM-FATT   PIC X(8).
+        05 FILLER             PIC X(37).
+*---------------------------------------------------------------------------------------*
+*    FD RELATIVA AL FILE SITCLIEN                                            *
+*---------------------------------------------------------------------------------------*      
+    FD SITCLIEN
+      LABEL RECORD IS STANDARD
+      RECORD CONTAINS 90-CHARACTERS
+         DATA RECORD IS REC-SITCLIE.
+    01 REC-SITCLIE    PIC X(90).
+*---------------------------------------------------------------------------------------*
+     WORKING-STORAGE SECTION.    
+----------------------------------------------------------------------------------------*         
+*---------------------------------------------------------------------------------------*
+*    DEFINIZIONE RECORD FILE FCLIENTI 
+----------------------------------------------------------------------------------------*      
+    01 WS-REC-CLIENTI.
+       05 WS-FCLI-COD-CLI   PIC 9(5) VALUES ZEROES.
+       05 WS-FCLI-INDIR     PIC X(20) VALUE SPACES.
+       05 WS-FCLI-TEL       PIC 9(10) VALUE ZEROES.
+       05 WS-FCLI-CITTA     PIC X(10) VALUE SPACES.
+       05 WS-FCLI-NOMINAT   PIC X(25) VALUE SPACES.
+       05 FILLER            PIC X(30) VALUE SPACES.
+*---------------------------------------------------------------------------------------*
+*    DEFINIZIONE RECORD FILE FFATTURE
+----------------------------------------------------------------------------------------*         
+    01 WS-REC-FATTURE-OLD.
+       05 WS-KEY-FFATTURE-OLD.
+          07 WS-FFAT-COD-CLI-OLD    PIC 9(5) VALUE ZEROES.
+          07 WS-FFAT-NUM-FATT-OLD   PIC X(8) VALUE SPACES.
+       05 WS-FFAT-IMPONIB-OLD       PIC 9(14) COMP-3 VALUE ZEROES.
+       05 WS-FFAT-IVA-OLD           PIC 9(14) COMP-3 VALUE ZEORES.
+       05 WS-FFAT-TOT-FATT-OLD      PIC 9(14) COMP-3 VALUE ZEROES.
+       05 FILLER                    PICX X(13) VALUE SPACES.
+    01 WS-REC-FATTURE-NEW.
+       05 WS-KEY-FFATTURE-NEW.
+          07 WS-FFAT-COD-CLI-NEW    PIC 9(5) VALUE ZEROES.
+          07 WS-FFAT-NUM-FATT-NEW   PIC X(8)   VALUE SPACES.
+       05 WS-FFAT-IMPONIB-NEW       PIC 9(14) COMP-3 VALUE ZEROES.
+       05 WS-FFAT-IVA-NEW          PIC 9(14) COMP-3 VALUE ZEORES.
+       05 WS-FFAT-TOT-FATT-NEW     PIC 9(14) COMP-3 VALUE ZEROES.
+       05 FILLER                   PIC X(13) VALUE SPACES.
+ *---------------------------------------------------------------------------------------*
+*    DEFINIZIONE RECORD FILE FSITCLIEN
+----------------------------------------------------------------------------------------*  
+   01  WS-REC-SITCLIE.
+       05 WS-SIT-COD-CLI            PIC 9(5) VALUE ZEROES.
+       05 WS-SIT-INDIR              PIC X(20) VALUE SPACES.
+       05 WS-SIT-TEL                PIC 9(10) VALUE ZEROES.
+       05 WS-SIT-NUM-TOT-FATT       PIC 9(8) VALUE SPACES.
+       05 WS-SIT-FATT-DA            PIC X(8) VALUE SPACES.
+       05 WS-SIT-FATT-A            PIC X(8) VALUE SPACES.
+       05 WS-SIT-TOT-IMPONIB       PIC 9(15) COMP-3 VALUE ZEROES.
+       05 WS-SIT-TOT-IVA           PIC 9(15) COMP-3 VALUE ZEROES.
+       05 WS-SIT-TOT-FATTURA       PIC 9(15) COMP-3 VALUE SPACES.
+       05 FILLER                   PIC X(7)  VALUE SPACES.
+ *---------------------------------------------------------------------------------------*
+*    DEFINIZIONE CAMPI CONTATORI
+----------------------------------------------------------------------------------------*         
+       01 WS-CAMPI-CONTATORI.
+       
